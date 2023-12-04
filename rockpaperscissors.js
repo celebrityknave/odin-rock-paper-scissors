@@ -1,43 +1,20 @@
+const selection = ["rock", "paper", "scissors"];
+const playerButtons = document.querySelectorAll('.playButton');
+const resetButton = document.querySelector('#resetButton');
+const computerSelectionField = document.querySelector('#computerSelectionField');
+const playerSelectionField = document.querySelector('#playerSelectionField');
+const gameResultField = document.querySelector("#gameResultField");
 
-const selection = ["rock", "paper", "scissors"]
+let computerScore = 0;
+let playerScore = 0;
+
 // Return random selection of rock, paper, or scissors
 function getComputerChoice()
 {
     let computerSelection = Math.floor(Math.random() * 3);
-    console.log("Computer entered " + selection[computerSelection]);
-    return computerSelection;
+    return selection[computerSelection];
 }
 
-// Get player selection
-function getPlayerChoice()
-{
-    let playerSelection = prompt("Rock, paper, or scissors? ").toLowerCase();
-    
-    return playerSelection;
-}
-
-function parsePlayerInput()
-{
-    let invalid_input = 1;
-
-    while(invalid_input)
-    {
-        let playerSelection = getPlayerChoice();
-
-        console.log("Player entered " + playerSelection);
-        // Parse input
-        for(let i = 0; i < selection.length; i++)
-        {
-            if(playerSelection === selection[i])
-            {
-                invalid_input = 0;
-                return i;
-            }
-        }
-    }
-}
-
-// Play round of rock, paper, scissors
 function playRound(playerSelection, computerSelection)
 {
     // States:
@@ -50,63 +27,85 @@ function playRound(playerSelection, computerSelection)
         return 0;
     }
     
-    if(playerSelection === 0)
+    if(playerSelection === "rock")
     {
-        if(computerSelection === 1) return 2;
+        if(computerSelection === "paper") return 2;
     }
     
-    if(playerSelection === 1)
+    if(playerSelection === "paper")
     {
-        if(computerSelection === 2) return 2;
+        if(computerSelection === "scissors") return 2;
     }
     
-    if(playerSelection === 2)
+    if(playerSelection === "scissors")
     {
-        if(computerSelection === 0) return 2;
+        if(computerSelection === "rock") return 2;
     }
     return 1;
 }
 
-function scoreGame(score, playerWins, computerWins)
+function scoreRound(score, playerScore, computerScore)
 {
     if(score === 0)
     {
-        console.log("Draw. Play again.");
+        gameResultField.textContent = "Draw. Play again.";
     }
     if(score === 1)
     {
-        console.log("Player wins round. Player score " + playerWins + ". Computer score " + computerWins + ".");
+        gameResultField.textContent = "Player wins round. Player score " + playerScore + ". Computer score " + computerScore + ".";
     }
     if(score === 2)
     {
-        console.log("Computer wins round. Player score " + playerWins + ". Computer score " + computerWins + ".");
+        gameResultField.textContent = "Computer wins round. Player score " + playerScore + ". Computer score " + computerScore + ".";
     }
 }
 
-function game()
+function playGame(playerChoice)
 {
-    let computerWins = 0;
-    let playerWins = 0;
-
-    while(computerWins < 3 && playerWins < 3)
+    if(computerScore > 4 )
     {
-        let playerSelection = parsePlayerInput();
-        let computerSelection = getComputerChoice();
-
-        let score = playRound(playerSelection, computerSelection);
-        if(score === 1)
-        {
-            playerWins++;
-        }
-        if(score === 2)
-        {
-            computerWins++;
-        }
-        scoreGame(score, playerWins, computerWins);
+        playerSelectionField.textContent = "";
+        computerSelectionField.textContent = "";
+        gameResultField.textContent = "Computer Wins! Press reset to play again.";
     }
 
-    console.log("Game end.")
+    if(playerScore > 4 )
+    {
+        playerSelectionField.textContent = "";
+        computerSelectionField.textContent = "";
+        gameResultField.textContent = "Player Wins! Press reset to play again.";
+    }
+
+    if(playerScore <= 4 && computerScore <= 4)
+    {
+        computerChoice = getComputerChoice();
+
+        playerSelectionField.textContent = "Player selected " + playerChoice;
+        computerSelectionField.textContent = "Computer selected " + computerChoice;
+
+        let score = playRound(playerChoice, computerChoice);
+
+        if(score === 1 ) {
+            playerScore++;
+        }
+        if(score === 2 ) {
+            computerScore++;
+        }
+        scoreRound(score, playerScore, computerScore);
+    }
 
 }
 
-game();
+playerButtons.forEach((playerButton) => {
+
+    playerButton.addEventListener('click', () => {
+        playGame(playerButton.id);
+    });
+    
+});
+
+resetButton.addEventListener('click', () => {
+    playerScore = 0;
+    computerScore = 0;
+    gameResultField.textContent = "Game reset.";
+});
